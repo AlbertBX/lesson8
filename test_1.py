@@ -14,8 +14,7 @@ def test_project():
 	'title':'Срочно надо сдать'
 	}
     resp = requests.post(base_url + '/projects', json=body, headers=my_headers)
-	#new_project	= resp.json()
-    new_project_id = new_project['id']
+    new_project_id = resp.json()['id']
 
     assert resp.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert body ['title'] == 'Срочно надо сдать'
@@ -25,22 +24,23 @@ def test_project():
 def test_create_projects_len():
 #	получить список проектов
     len_projects = requests.get(base_url + '/projects', headers=my_headers)
-    #len_projects_data = len_projects.json()
+    len_projects_data = len_projects.json()
     len_projects_data = len_projects.json().get("content", [])
-    assert len_projects.json().status_code == 200
-#	создать проект
+    assert len_projects.status_code == 200
+#	изменить проект
     body = {
-    'title': 'Срочно надо сдать и срочно изменить',
-    'users':{'c7c50038-290a-4ca3-816f-d13f9a7380e6': 'admin'}
-      }
-    resp = requests.post(base_url + '/projects', json=body, headers=my_headers)
-    assert resp.status_code == 201
+    'title': 'Срочно надо сдать и срочно изменить'
+        }
+    resp = requests.put(base_url + '/projects/c7c50038-290a-4ca3-816f-d13f9a7380e6', json=body, headers=my_headers)
+    assert body ['title'] == 'Срочно надо сдать и срочно изменить'
+    assert resp.status_code == 200
 #	повторно получить список проектов
     full_len_projects = requests.get(base_url + '/projects', headers=my_headers)
-    #full_len_projects_data = full_len_projects.json()
+    full_len_projects_data = full_len_projects.json()
     full_len_projects_data = full_len_projects.json().get("content", [])
-    #assert full_len_projects.status_code == 200
+    assert full_len_projects.status_code == 200
 #	сравнить первый и второй списки
-    assert len(len_projects_data) < len(full_len_projects_data)
+    assert len(len_projects_data) == len(full_len_projects_data)
+
 
 
